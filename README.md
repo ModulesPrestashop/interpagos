@@ -9,3 +9,9 @@ Este módulo permite:
 * Recibir y actualizar el estado del pedido automáticamente
 * Recibir y registrar el ID de la transacción
 * Usar URL amigable para la página de confirmación, respuesta y actualización
+
+## Changelog
+
+* 1.0.2 Corrección de pequeños errores
+* 1.0.1 Cambios menores
+* 1.0.0 Versión inicial
