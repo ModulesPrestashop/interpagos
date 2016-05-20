@@ -1,27 +1,18 @@
 <?php
 /**
-* 2007-2016 PrestaShop
+* 2015 Jorge Vargas
 *
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Academic Free License (AFL 3.0)
-* that is bundled with this package in the file LICENSE.txt.
-* It is also available through the world-wide-web at this URL:
-* http://opensource.org/licenses/afl-3.0.php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to license@prestashop.com so we can send you a copy immediately.
+* This source file is subject to the End User License Agreement (EULA)
 *
-* DISCLAIMER
+* See attachmente file LICENSE
 *
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
-* versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
-*
-*  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2016 PrestaShop SA
-*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
-*  International Registered Trademark & Property of PrestaShop SA
+* @author    Jorge Vargas <jorgevargaslarrota@hotmail.com>
+* @copyright 2012-2015 Jorge Vargas
+* @license   End User License Agreement (EULA)
+* @package   interpagos
+* @version   1.0
 */
 
 class InterpagosAnswerModuleFrontController extends ModuleFrontController
@@ -37,20 +28,18 @@ class InterpagosAnswerModuleFrontController extends ModuleFrontController
     public function initContent()
     {
         parent::initContent();
-        $this->module->validation();
+        $url = 'index.php?controller=order';
+        if ($this->module->validation()) {
+            if (Tools::getIsset('IDReference') && Tools::getIsset('ExtraData2') && Tools::getIsset('ExtraData1')) {
+                $id_module = (int)Tools::getValue('ExtraData2');
+                $key = pSQL(Tools::getValue('ExtraData1'));
+                $id_cart = pSQL(Tools::getValue('IDReference'));
+                $id_order = $this->module->currentOrder;
+                $request = "id_order={$id_order}&id_cart={$id_cart}&id_module={$id_module}&key={$key}";
 
-        if (Tools::getIsset('IDReference') && Tools::getIsset('ExtraData2') && Tools::getIsset('ExtraData1')) {
-            $id_module = (int)Tools::getValue('ExtraData2');
-            $key = pSQL(Tools::getValue('ExtraData1'));
-            $id_cart = pSQL(Tools::getValue('IDReference'));
-            $id_order = $this->module->currentOrder;
-            $request = "id_order={$id_order}&id_cart={$id_cart}&id_module={$id_module}&key={$key}";
-
-            $url = $this->context->link->getPageLink('order-confirmation', true, null, $request);
-        } else {
-            $url = 'index.php?controller=order';
+                $url = $this->context->link->getPageLink('order-confirmation', true, null, $request);
+            }
         }
-
         Tools::redirect($url);
     }
 }

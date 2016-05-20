@@ -1,27 +1,18 @@
 <?php
 /**
-* 2007-2016 PrestaShop
+* 2015 Jorge Vargas
 *
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Academic Free License (AFL 3.0)
-* that is bundled with this package in the file LICENSE.txt.
-* It is also available through the world-wide-web at this URL:
-* http://opensource.org/licenses/afl-3.0.php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to license@prestashop.com so we can send you a copy immediately.
+* This source file is subject to the End User License Agreement (EULA)
 *
-* DISCLAIMER
+* See attachmente file LICENSE
 *
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
-* versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
-*
-*  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2016 PrestaShop SA
-*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
-*  International Registered Trademark & Property of PrestaShop SA
+* @author    Jorge Vargas <jorgevargaslarrota@hotmail.com>
+* @copyright 2012-2015 Jorge Vargas
+* @license   End User License Agreement (EULA)
+* @package   interpagos
+* @version   1.0
 */
 
 if (!defined('_PS_VERSION_')) {
@@ -44,7 +35,7 @@ class Interpagos extends PaymentModule
         $this->currencies = true;
         $this->currencies_mode = 'checkbox';
 
-        $this->version = '1.0.2';
+        $this->version = '1.0.3';
         $this->need_instance = 1;
         $this->bootstrap = true;
 
@@ -55,7 +46,7 @@ class Interpagos extends PaymentModule
 
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
-        if (!Configuration::get('POL_IDUSUARIO') || !Configuration::get('POL_LLAVE')) {
+        if (!Configuration::get('INTERPAGOS_ID_USUARIO') || !Configuration::get('INTERPAGOS_LLAVE')) {
             $this->warning = $this->l('No authentication provided');
         }
 
@@ -78,9 +69,9 @@ class Interpagos extends PaymentModule
         && $this->registerHook('payment')
         && $this->registerHook('orderConfirmation')
         && $this->registerHook('displayCustomerAccount')
-        && Configuration::updateValue('POL_MINIMUM', '2000')
-        && Configuration::updateValue('POL_MAXIMUM', '2000000')
-        && Configuration::updateValue('POL_MODO', 0)) {
+        && Configuration::updateValue('INTERPAGOS_MINIMUM', '2000')
+        && Configuration::updateValue('INTERPAGOS_MAXIMUM', '2000000')
+        && Configuration::updateValue('INTERPAGOS_PRODUCCION', 0)) {
             return true;
         }
         return false;
@@ -117,11 +108,11 @@ class Interpagos extends PaymentModule
         $order_state->delete();
 
         Configuration::deleteByName('INTERPAGOS_WAITING_PAYMENT');
-        Configuration::deleteByName('POL_MINIMUM');
-        Configuration::deleteByName('POL_MAXIMUM');
-        Configuration::deleteByName('POL_MODO');
-        Configuration::deleteByName('POL_IDUSUARIO');
-        Configuration::deleteByName('POL_LLAVE');
+        Configuration::deleteByName('INTERPAGOS_MINIMUM');
+        Configuration::deleteByName('INTERPAGOS_MAXIMUM');
+        Configuration::deleteByName('INTERPAGOS_PRODUCCION');
+        Configuration::deleteByName('INTERPAGOS_ID_USUARIO');
+        Configuration::deleteByName('INTERPAGOS_LLAVE');
         if (!parent::uninstall()) {
             return false;
         }
@@ -156,23 +147,23 @@ class Interpagos extends PaymentModule
     private function postValidation()
     {
         if (Tools::isSubmit('submit'.$this->name)) {
-            if (!Tools::getIsset('POL_IDUSUARIO')) {
+            if (!Tools::getIsset('INTERPAGOS_ID_USUARIO')) {
                 $this->_errors[] = $this->l('Interpagos Customer ID is requiered.');
             }
 
-            if (!Tools::getIsset('POL_LLAVE')) {
+            if (!Tools::getIsset('INTERPAGOS_LLAVE')) {
                 $this->_errors[] = $this->l('Interpagos KEY is required.');
             }
 
-            if (!Tools::getIsset('POL_MINIMUM') || !Validate::isUnsignedFloat(Tools::getValue('POL_MINIMUM'))) {
+            if (!Tools::getIsset('INTERPAGOS_MINIMUM') || !Validate::isUnsignedFloat(Tools::getValue('INTERPAGOS_MINIMUM'))) {
                 $this->_errors[] = $this->l('Minimum: Error in typed value');
             }
 
-            if (!Tools::getIsset('POL_MAXIMUM') || !Validate::isUnsignedFloat(Tools::getValue('POL_MAXIMUM'))) {
+            if (!Tools::getIsset('INTERPAGOS_MAXIMUM') || !Validate::isUnsignedFloat(Tools::getValue('INTERPAGOS_MAXIMUM'))) {
                 $this->_errors[] = $this->l('Maximum: Error in typed value');
             }
 
-            if (Tools::getValue('POL_MINIMUM') >= Tools::getValue('POL_MAXIMUM')) {
+            if (Tools::getValue('INTERPAGOS_MINIMUM') >= Tools::getValue('INTERPAGOS_MAXIMUM')) {
                 $this->_errors[] = $this->l('Minimum value must be less than maximum');
             }
         }
@@ -181,11 +172,11 @@ class Interpagos extends PaymentModule
     private function postProcess()
     {
         if (Tools::isSubmit('submit'.$this->name)) {
-            Configuration::updateValue('POL_IDUSUARIO', pSQL(Tools::getValue('POL_IDUSUARIO')));
-            Configuration::updateValue('POL_LLAVE', pSQL(Tools::getValue('POL_LLAVE')));
-            Configuration::updateValue('POL_MODO', (bool)Tools::getValue('POL_MODO'));
-            Configuration::updateValue('POL_MINIMUM', (float)pSQL(Tools::getValue('POL_MINIMUM')));
-            Configuration::updateValue('POL_MAXIMUM', (float)pSQL(Tools::getValue('POL_MAXIMUM')));
+            Configuration::updateValue('INTERPAGOS_ID_USUARIO', pSQL(Tools::getValue('INTERPAGOS_ID_USUARIO')));
+            Configuration::updateValue('INTERPAGOS_LLAVE', pSQL(Tools::getValue('INTERPAGOS_LLAVE')));
+            Configuration::updateValue('INTERPAGOS_PRODUCCION', (bool)Tools::getValue('INTERPAGOS_PRODUCCION'));
+            Configuration::updateValue('INTERPAGOS_MINIMUM', (float)pSQL(Tools::getValue('INTERPAGOS_MINIMUM')));
+            Configuration::updateValue('INTERPAGOS_MAXIMUM', (float)pSQL(Tools::getValue('INTERPAGOS_MAXIMUM')));
         }
 
         $this->_html .= $this->displayConfirmation($this->l('Settings updated'));
@@ -210,20 +201,20 @@ class Interpagos extends PaymentModule
                     array(
                         'type' => 'text',
                         'label' => $this->l('Customer ID'),
-                        'name' => 'POL_IDUSUARIO',
+                        'name' => 'INTERPAGOS_ID_USUARIO',
                         'desc' => $this->l('Type your customer ID'),
                     ),
                     array(
                         'type' => 'text',
                         'label' => $this->l('KEY'),
-                        'name' => 'POL_LLAVE',
+                        'name' => 'INTERPAGOS_LLAVE',
                         'desc' => $this->l('Type your KEY'),
                     ),
                     array(
                         'type' => 'switch',
                         'label' => $this->l('Production mode'),
-                        'name' => 'POL_MODO',
-                        'desc' => $this->l('Set if you will work in test or production mode'),
+                        'name' => 'INTERPAGOS_PRODUCCION',
+                        'desc' => $this->l('Set if you will work in production mode, Yes: Production, No: Test.'),
                         'is_bool' => true,
                         'values' => array(
                             array(
@@ -242,13 +233,13 @@ class Interpagos extends PaymentModule
                     array(
                         'type' => 'text',
                         'label' => $this->l('Minimum'),
-                        'name' => 'POL_MINIMUM',
+                        'name' => 'INTERPAGOS_MINIMUM',
                         'desc' => $this->l('Type the minimum value for the payment method is available, (e.g. 12345 or 12345.67)'),
                     ),
                     array(
                         'type' => 'text',
                         'label' => $this->l('Maximum'),
-                        'name' => 'POL_MAXIMUM',
+                        'name' => 'INTERPAGOS_MAXIMUM',
                         'desc' => $this->l('Type the maximum value for the payment method is available, (e.g. 12345 or 12345.67)'),
                     ),
                 ),
@@ -290,11 +281,11 @@ class Interpagos extends PaymentModule
     public function getConfigFieldsValues()
     {
         return array(
-            'POL_IDUSUARIO' => Tools::getValue('POL_IDUSUARIO', Configuration::get('POL_IDUSUARIO')),
-            'POL_LLAVE' => Tools::getValue('POL_LLAVE', Configuration::get('POL_LLAVE')),
-            'POL_MODO' => Tools::getValue('POL_MODO', Configuration::get('POL_MODO')),
-            'POL_MINIMUM' => Tools::getValue('POL_MINIMUM', Configuration::get('POL_MINIMUM')),
-            'POL_MAXIMUM' => Tools::getValue('POL_MAXIMUM', Configuration::get('POL_MAXIMUM')),
+            'INTERPAGOS_ID_USUARIO' => Tools::getValue('INTERPAGOS_ID_USUARIO', Configuration::get('INTERPAGOS_ID_USUARIO')),
+            'INTERPAGOS_LLAVE' => Tools::getValue('INTERPAGOS_LLAVE', Configuration::get('INTERPAGOS_LLAVE')),
+            'INTERPAGOS_PRODUCCION' => Tools::getValue('INTERPAGOS_PRODUCCION', Configuration::get('INTERPAGOS_PRODUCCION')),
+            'INTERPAGOS_MINIMUM' => Tools::getValue('INTERPAGOS_MINIMUM', Configuration::get('INTERPAGOS_MINIMUM')),
+            'INTERPAGOS_MAXIMUM' => Tools::getValue('INTERPAGOS_MAXIMUM', Configuration::get('INTERPAGOS_MAXIMUM')),
         );
     }
 
@@ -309,13 +300,11 @@ class Interpagos extends PaymentModule
             return;
         }
 
-        $pol_minimum = (float)Configuration::get('POL_MINIMUM');
-        $pol_maximum = (float)Configuration::get('POL_MAXIMUM');
-        if ($pol_minimum || $pol_maximum) {
-            $total_cart = (float)$this->context->cart->getOrderTotal(false);
-            if ($total_cart < $pol_minimum || $total_cart > $pol_maximum) {
-                return;
-            }
+        $interpagos_minimum = (float)Configuration::get('INTERPAGOS_MINIMUM');
+        $interpagos_maximum = (float)Configuration::get('INTERPAGOS_MAXIMUM');
+        $total_cart = (float)$this->context->cart->getOrderTotal(false);
+        if ($total_cart < $interpagos_minimum || $total_cart > $interpagos_maximum) {
+            return;
         }
 
         return $this->display(__FILE__, 'payment.tpl');
@@ -354,15 +343,15 @@ class Interpagos extends PaymentModule
 
         $status = $params['objOrder']->getCurrentState();
         switch ($status) {
-            case _PS_OS_PAYMENT_:
-            case _PS_OS_OUTOFSTOCK_:
+            case (int)Configuration::get('PS_OS_PAYMENT'):
+            case (int)Configuration::get('PS_OS_OUTOFSTOCK'):
                 $this->context->smarty->assign('status', 'complete');
                 break;
-            case Configuration::get('INTERPAGOS_WAITING_PAYMENT'):
+            case (int)Configuration::get('INTERPAGOS_WAITING_PAYMENT'):
                 $this->context->smarty->assign('status', 'pending');
                 break;
-            case _PS_OS_ERROR_:
-            case _PS_OS_CANCELED_:
+            case (int)Configuration::get('PS_OS_ERROR'):
+            case (int)Configuration::get('PS_OS_CANCELED'):
             default:
                 $this->context->smarty->assign('status', 'failed');
                 break;
@@ -415,12 +404,12 @@ class Interpagos extends PaymentModule
         $token_transaction_code = pSQL(Tools::getValue('TokenTransactionCode'));
 
         // Check local and remote variables
-        if ($id_client != Configuration::get('POL_IDUSUARIO')) {
+        if ($id_client != Configuration::get('INTERPAGOS_ID_USUARIO')) {
             $errors[] = $this->l('Error in seller ID');
         }
 
         // Check for signature
-        $firma_local_content = $id_client.'-'.Configuration::get('POL_LLAVE').'-'.$id_reference.'-'.$total_amount.'-'.$transaction_code;
+        $firma_local_content = $id_client.'-'.Configuration::get('INTERPAGOS_LLAVE').'-'.$id_reference.'-'.$total_amount.'-'.$transaction_code;
         $firma_local = sha1($firma_local_content);
         if ($firma_local != $token_transaction_code) {
             $errors[] = $this->l('Error in token transaction code.  Local token is: ').$firma_local;
@@ -439,7 +428,7 @@ class Interpagos extends PaymentModule
             $message .= $error.'\n';
         }
 
-        $message = Tools::nl2br(strip_tags(utf8_encode($message)));
+        $message = utf8_encode(Tools::nl2br(pSQL($message)));
 
         // Then, load the customer cart and perform some checks
         $this->context->cart = new Cart($id_reference);
@@ -477,16 +466,28 @@ class Interpagos extends PaymentModule
             $module_name = $this->displayName;
 
             if (!$this->context->cart->OrderExists()) {
-                $this->validateOrder($id_reference, $id_order_state, $total_amount, $module_name, $message, $extra_data, null, false, $extra_data_1);
+                return $this->validateOrder(
+                    $id_reference,
+                    $id_order_state,
+                    $total_amount,
+                    $module_name,
+                    $message,
+                    $extra_data,
+                    null,
+                    false,
+                    $extra_data_1
+                );
             } else {
                 $id_order = (int)Order::getOrderByCartId($this->context->cart->id);
 
                 $order = new Order($id_order);
-                if (Validate::isLoadedObject($order) && $id_order_state != $order->getCurrentState()) {
-                    $order->setCurrentState($id_order_state);
+                if (Validate::isLoadedObject($order)
+                && $id_order_state != $order->getCurrentState()) {
+                    return $order->setCurrentState($id_order_state);
                 }
             }
         }
+        return false;
     }
 
     public function hookDisplayCustomerAccount()
@@ -507,53 +508,47 @@ class Interpagos extends PaymentModule
         $total_amount = (float)$cart->getOrderTotal();
         $tax_amount = (float)$total_amount - (float)$base_amount;
 
-        $pol_params = array();
+        $params = array();
         // Seller
-        $pol_params['IdClient'] = Configuration::get('POL_IDUSUARIO');
-        $pol_params['PayMethod'] = 1;
-        $pol_params['RecurringBill'] = 0;
-        $pol_params['LanguajeInterface'] = 'SP';
-        $pol_params['Test'] = (Configuration::get('POL_MODO') ? 0 : 1);
-        if ($pol_params['Test']) {
-            //$this->context->smarty->assign('URL_POL', Configuration::get('POL_URLPRUEBA'));
-            $this->context->smarty->assign('prueba', 1);
-        } else {
-            //$this->context->smarty->assign('URL_POL', Configuration::get('POL_URLPRODUCCION'));
-            $this->context->smarty->assign('prueba', 0);
-        }
+        $params['IdClient'] = Configuration::get('INTERPAGOS_ID_USUARIO');
+        $params['PayMethod'] = 1;
+        $params['RecurringBill'] = 0;
+        $params['LanguajeInterface'] = 'SP';
+        $params['Test'] = (Configuration::get('INTERPAGOS_PRODUCCION') ? 0 : 1);
+        $this->context->smarty->assign('prueba', (int)$params['Test']);
 
         // Customer
-        $pol_params['ShopperName'] = $this->context->customer->firstname.' '.$this->context->customer->lastname;
-        $pol_params['ShopperEmail'] = $this->context->customer->email;
+        $params['ShopperName'] = $this->context->customer->firstname.' '.$this->context->customer->lastname;
+        $params['ShopperEmail'] = $this->context->customer->email;
 
         // Cart
-        $pol_params['IDReference'] = (int)$cart->id;
-        $pol_params['Reference'] = $this->l('Order of cart #').$pol_params['IDReference'];
-        $pol_params['ExtraData1'] = $cart->secure_key;
-        $pol_params['ExtraData2'] = (int)$this->id;
+        $params['IDReference'] = (int)$cart->id;
+        $params['Reference'] = $this->l('Order of cart #').$params['IDReference'];
+        $params['ExtraData1'] = $cart->secure_key;
+        $params['ExtraData2'] = (int)$this->id;
 
         // Price
-        $pol_params['TotalAmount'] = number_format((float)$total_amount, 2, '.', '');
-        $pol_params['TaxAmount'] = number_format((float)$tax_amount, 2, '.', '');
-        $pol_params['BaseAmount'] = number_format((float)$base_amount, 2, '.', '');
-        $pol_params['Currency'] = $this->context->currency->iso_code;
+        $params['TotalAmount'] = number_format((float)$total_amount, 2, '.', '');
+        $params['TaxAmount'] = number_format((float)$tax_amount, 2, '.', '');
+        $params['BaseAmount'] = number_format((float)$base_amount, 2, '.', '');
+        $params['Currency'] = $this->context->currency->iso_code;
 
         // Token
-        $id_client = $pol_params['IdClient'];
-        $pol_llave = Configuration::get('POL_LLAVE');
-        $id_reference = $pol_params['IDReference'];
-        $total_amount = $pol_params['TotalAmount'];
-        $pol_token = "{$id_client}-{$pol_llave}-{$id_reference}-{$total_amount}";
-        $pol_params['Token'] = sha1($pol_token);
+        $id_client = $params['IdClient'];
+        $interpagos_llave = Configuration::get('INTERPAGOS_LLAVE');
+        $id_reference = $params['IDReference'];
+        $total_amount = $params['TotalAmount'];
+        $pol_token = "{$id_client}-{$interpagos_llave}-{$id_reference}-{$total_amount}";
+        $params['Token'] = sha1($pol_token);
 
         // URL
-        $pol_params['cancel_url'] = $this->context->link->getPageLink('order', true);
-        $pol_params['PageAnswer'] = $this->context->link->getModuleLink('interpagos', 'answer', array(), true);
-        $pol_params['PageConfirm'] = $this->context->link->getModuleLink('interpagos', 'update', array(), true);
+        $params['cancel_url'] = $this->context->link->getPageLink('order', true);
+        $params['PageAnswer'] = $this->context->link->getModuleLink('interpagos', 'answer', array(), true);
+        $params['PageConfirm'] = $this->context->link->getModuleLink('interpagos', 'update', array(), true);
 
         // Sort
-        ksort($pol_params);
+        ksort($params);
 
-        return $pol_params;
+        return $params;
     }
 }

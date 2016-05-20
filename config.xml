@@ -2,7 +2,7 @@
         <module>
             <name>pol</name>
             <displayName><![CDATA[Interpagos]]></displayName>
-            <version><![CDATA[1.0.2]]></version>
+            <version><![CDATA[1.0.3]]></version>
             <description><![CDATA[Acepte pagos con Interpagos - Colombia]]></description>
             <author><![CDATA[Jorge Vargas]]></author>
             <tab><![CDATA[payments_gateways]]></tab>

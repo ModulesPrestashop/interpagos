@@ -1,26 +1,17 @@
-{**
-* 2007-2016 PrestaShop
+{*
+* 2015 Jorge Vargas
 *
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Academic Free License (AFL 3.0)
-* that is bundled with this package in the file LICENSE.txt.
-* It is also available through the world-wide-web at this URL:
-* http://opensource.org/licenses/afl-3.0.php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to license@prestashop.com so we can send you a copy immediately.
+* This source file is subject to the End User License Agreement (EULA)
 *
-* DISCLAIMER
+* See attachmente file LICENSE
 *
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
-* versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
-*
-*  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2016 PrestaShop SA
-*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
-*  International Registered Trademark & Property of PrestaShop SA
+* @author    Jorge Vargas <jorgevargaslarrota@hotmail.com>
+* @copyright 2012-2015 Jorge Vargas
+* @license   End User License Agreement (EULA)
+* @package   interpagos
+* @version   1.0
 *}
 
 {capture name=path}
@@ -105,8 +96,8 @@
         <div class="clearfix"></div>
     </div>
     <form id="interpagos_form" name="interpagos_form" action="https://secure.interpagos.net/gateway/" method="post" class="hidden">
-    	{foreach from=$pol_params key=pol_key item=pol_value}
-    		<input type="hidden" name="{$pol_key|escape:'htmlall':'UTF-8'}" value="{$pol_value|escape:'htmlall':'UTF-8'}" />
+    	{foreach from=$form_params key=key item=value}
+    		<input type="hidden" name="{$key|escape:'htmlall':'UTF-8'}" value="{$value|escape:'htmlall':'UTF-8'}" />
     	{/foreach}
     </form>
     <form id="validateInterpagos" action="#" method="post">
